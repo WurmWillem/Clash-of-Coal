@@ -13,7 +13,7 @@ struct Map {
 // Main
 async fn main() {
     // Map struct
-    let mut map = Map {
+    let map = Map {
         width: 300.0,
         height: 300.0,
         curr_center: (screen_width() / 2.0 - 150.0, screen_height() / 2.0 - 150.0),

@@ -24,10 +24,10 @@ impl Camera {
             self.origin.0 += 0.01;
         };
         if is_key_down(KeyCode::S) {
-            self.origin.1 -= 0.01;
+            self.origin.1 += 0.01;
         };
         if is_key_down(KeyCode::W) {
-            self.origin.1 += 0.01;
+            self.origin.1 -= 0.01;
         };
 
         // Update camera position

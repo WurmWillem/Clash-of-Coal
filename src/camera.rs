@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
 
-use crate::{SCREENSIZE};
+use crate::SCREENSIZE;
 
 const CAMERA_MOVE_MULT: f32 = 2.;
 
@@ -44,6 +44,16 @@ impl Camera {
         }
 
         //this function actually updates the camera based on the origin
+        set_camera(&Camera2D {
+            target: vec2(
+                self.origin.0 * -CAMERA_MOVE_MULT,
+                self.origin.1 * CAMERA_MOVE_MULT,
+            ),
+            ..Default::default()
+        });
+    }
+
+    pub fn set_as_cam(&self) {
         set_camera(&Camera2D {
             target: vec2(
                 self.origin.0 * -CAMERA_MOVE_MULT,

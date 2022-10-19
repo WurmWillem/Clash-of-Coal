@@ -1,43 +1,48 @@
 use macroquad::prelude::*;
 
-// Map
-struct Map {
-    width: f32,
-    height: f32,
-}
+mod camera;
+use camera::Camera;
 
-// Clash of clans
-#[macroquad::main("Clash of clans")]
+mod file_IO;
+use file_IO::*;
 
-// Main
+pub const SCREENSIZE: (f32, f32) = (720., 720.); //Change this if you want to, old was 640, 480
+
+#[macroquad::main("Clash of Clans")]
 async fn main() {
-    // Map struct
-    let mut map = Map {
-        width: 300.0,
-        height: 300.0,
-    };
+    request_new_screen_size(SCREENSIZE.0, SCREENSIZE.1); //Set new screensize
 
-    // Vars
-    let mut camera_origin = (400., 300.);
-    let mut offset = (0., 0.);
+    //Initialize map and camera
+    let map_tex = load_texture("map.png").await.unwrap();
+    let map = Map::new(map_tex);
+    let mut camera = Camera::new();
 
-    // Game loop
+    load_resources();
+
     loop {
-        // Clear screen
         clear_background(BLACK);
 
-        // Update map position
-        if is_mouse_button_pressed(MouseButton::Left) {
-            offset = (mouse_position().0 - camera_origin.0, mouse_position().1 - camera_origin.1);
-        }
-        if is_mouse_button_down(MouseButton::Left) {
-            camera_origin = (mouse_position().0 - offset.0, mouse_position().1 - offset.1)
-        }
+        camera.update();
+        map.draw();
 
-        // Draw map
-        draw_rectangle(camera_origin.0 - map.width / 2., camera_origin.1 - map.height / 2., map.width, map.height, GREEN);
+        next_frame().await;
+    }
+}
 
-        // Next_frame
-        next_frame().await
+struct Map {
+    tex: Texture2D,
+}
+impl Map {
+    pub fn new(tex: Texture2D) -> Self {
+        Self { tex }
+    }
+
+    pub fn draw(&self) {
+        let params = DrawTextureParams {
+            dest_size: Some(Vec2::new(1., 1.)),
+            ..Default::default()
+        };
+
+        draw_texture_ex(self.tex, 0., 0., WHITE, params);
     }
 }

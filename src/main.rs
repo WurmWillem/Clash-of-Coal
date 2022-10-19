@@ -1,73 +1,43 @@
 use macroquad::prelude::*;
 
-// Map
-struct Map {
-    width: f32,
-    height: f32,
-}
+mod camera;
+use camera::Camera;
 
-struct Object {
-    x: f32,
-    y: f32,
-}
+pub const SCREENSIZE: (f32, f32) = (720., 720.); //Change this if you want to, old was 640, 480
 
-// Clash of clans
-#[macroquad::main("Clash of clans")]
-
-// Main
+#[macroquad::main("Clash of Clans")]
 async fn main() {
-    // Map struct
-    let map = Map {
-        width: 300.0,
-        height: 300.0,
-    };
+    request_new_screen_size(SCREENSIZE.0, SCREENSIZE.1); //Set new screensize
 
-    // Object struct
-    let house = Object {
-        // Coords relative to map
-        x: 100.,
-        y: 100.,
-    };
+    //Initialize map and camera
+    let map_tex = load_texture("map.png").await.unwrap();
+    let map = Map::new(map_tex);
+    let mut camera = Camera::new();
 
-    // Vars
-    let mut camera_origin = (400., 300.);
-    let mut offset = (0., 0.);
-
-    // Game loop
     loop {
-        // Clear screen
         clear_background(BLACK);
 
-        // Update map position
-        if is_mouse_button_pressed(MouseButton::Left) {
-            offset = (mouse_position().0 - camera_origin.0, mouse_position().1 - camera_origin.1);
-        }
-        if is_mouse_button_down(MouseButton::Left) {
-            camera_origin = (mouse_position().0 - offset.0, mouse_position().1 - offset.1);
-        }
+        camera.update();
+        map.draw();
 
-        // Draw map
-        draw_rectangle(camera_origin.0 - map.width / 2., camera_origin.1 - map.height / 2., map.width, map.height, WHITE);
-        
-        // Make a loop for this-------------
-        draw_rectangle(camera_origin.0 - map.width / 2. + 0., camera_origin.1 - map.height / 2., 50., 50., GREEN);
-        draw_rectangle(camera_origin.0 - map.width / 2. + 50., camera_origin.1 - map.height / 2., 50., 50., DARKGREEN);
-        draw_rectangle(camera_origin.0 - map.width / 2. + 100., camera_origin.1 - map.height / 2., 50., 50., GREEN);
-        draw_rectangle(camera_origin.0 - map.width / 2. + 150., camera_origin.1 - map.height / 2., 50., 50., DARKGREEN);
-        draw_rectangle(camera_origin.0 - map.width / 2. + 200., camera_origin.1 - map.height / 2., 50., 50., GREEN);
-        draw_rectangle(camera_origin.0 - map.width / 2. + 250., camera_origin.1 - map.height / 2., 50., 50., DARKGREEN);
-
-        draw_rectangle(camera_origin.0 - map.width / 2. + 0., camera_origin.1 - map.height / 2. + 50., 50., 50., DARKGREEN);
-        draw_rectangle(camera_origin.0 - map.width / 2. + 50., camera_origin.1 - map.height / 2. + 50., 50., 50., GREEN);
-        draw_rectangle(camera_origin.0 - map.width / 2. + 100., camera_origin.1 - map.height / 2. + 50., 50., 50., DARKGREEN);
-        draw_rectangle(camera_origin.0 - map.width / 2. + 150., camera_origin.1 - map.height / 2. + 50., 50., 50., GREEN);
-        draw_rectangle(camera_origin.0 - map.width / 2. + 200., camera_origin.1 - map.height / 2. + 50., 50., 50., DARKGREEN);
-        draw_rectangle(camera_origin.0 - map.width / 2. + 250., camera_origin.1 - map.height / 2. + 50., 50., 50., GREEN);
-
-        // Draw house on map (black square)
-        draw_rectangle(camera_origin.0 - map.width / 2. + house.x, camera_origin.1 - map.height / 2. + house.y, 10., 10., BLACK);
-
-        // Next_frame
         next_frame().await;
+    }
+}
+
+struct Map {
+    tex: Texture2D,
+}
+impl Map {
+    pub fn new(tex: Texture2D) -> Self {
+        Self { tex }
+    }
+
+    pub fn draw(&self) {
+        let params = DrawTextureParams {
+            dest_size: Some(Vec2::new(1., 1.)),
+            ..Default::default()
+        };
+
+        draw_texture_ex(self.tex, 0., 0., WHITE, params);
     }
 }

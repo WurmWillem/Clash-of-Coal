@@ -1,2 +1,6 @@
+<<<<<<< Updated upstream
 hello
 world
+=======
+100
+>>>>>>> Stashed changes

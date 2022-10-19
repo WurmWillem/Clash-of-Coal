@@ -3,8 +3,13 @@ use macroquad::prelude::*;
 mod camera;
 use camera::Camera;
 
+<<<<<<< Updated upstream
 mod file_IO;
 use file_IO::*;
+=======
+mod resources;
+use resources::*;
+>>>>>>> Stashed changes
 
 pub const SCREENSIZE: (f32, f32) = (720., 720.); //Change this if you want to, old was 640, 480
 
@@ -17,7 +22,14 @@ async fn main() {
     let map = Map::new(map_tex);
     let mut camera = Camera::new();
 
+<<<<<<< Updated upstream
     load_resources();
+=======
+    let resources = Resources::new(0).await;
+    resources.load_gold();
+
+    let mut cam = Camera::new();
+>>>>>>> Stashed changes
 
     loop {
         clear_background(BLACK);

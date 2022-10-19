@@ -38,7 +38,7 @@ impl Resources {
          draw_text(&self.gold.to_string(), 170., 51., 40., BLACK)
      }
 
-     pub fn load_gold(&self) {          
+     pub fn load_gold(&mut self) {          
           let contents = fs::read_to_string("resources.txt")
               .expect("Should have been able to read the file");
           

@@ -3,9 +3,6 @@ use macroquad::prelude::*;
 mod camera;
 use camera::Camera;
 
-mod file_IO;
-use file_IO::*;
-
 mod resources;
 use resources::*;
 
@@ -20,9 +17,7 @@ async fn main() {
     let map = Map::new(map_tex);
     let mut camera = Camera::new();
 
-    load_resources();
-
-    let resources = Resources::new(0).await;
+    let mut resources = Resources::new(0).await;
     resources.load_gold();
 
     let mut cam = Camera::new();
@@ -32,6 +27,7 @@ async fn main() {
 
         camera.update();
         map.draw();
+        resources.draw();
 
         next_frame().await;
     }

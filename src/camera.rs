@@ -2,10 +2,10 @@ use macroquad::prelude::*;
 
 use crate::SCREENSIZE;
 
-const CAMERA_MOVE_MULT: f32 = 2.;
+pub const CAMERA_MOVE_MULT: f32 = 2.;
 
 pub struct Camera {
-    origin: (f32, f32),
+    pub origin: (f32, f32),
     offset: (f32, f32),
 }
 impl Camera {
@@ -40,7 +40,6 @@ impl Camera {
         if is_mouse_button_down(MouseButton::Left) {
             self.origin.0 = mouse_position().0 / SCREENSIZE.0 - self.offset.0;
             self.origin.1 = mouse_position().1 / SCREENSIZE.1 - self.offset.1;
-            println!("{:?}", self.origin);
         }
 
         //this function actually updates the camera based on the origin

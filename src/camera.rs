@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
 
-use crate::{SCREENSIZE};
+use crate::SCREENSIZE;
 
 const CAMERA_MOVE_MULT: f32 = 2.;
 
@@ -40,9 +40,20 @@ impl Camera {
         if is_mouse_button_down(MouseButton::Left) {
             self.origin.0 = mouse_position().0 / SCREENSIZE.0 - self.offset.0;
             self.origin.1 = mouse_position().1 / SCREENSIZE.1 - self.offset.1;
+            println!("{:?}", self.origin);
         }
 
         //this function actually updates the camera based on the origin
+        set_camera(&Camera2D {
+            target: vec2(
+                self.origin.0 * -CAMERA_MOVE_MULT,
+                self.origin.1 * CAMERA_MOVE_MULT,
+            ),
+            ..Default::default()
+        });
+    }
+
+    pub fn set_as_cam(&self) {
         set_camera(&Camera2D {
             target: vec2(
                 self.origin.0 * -CAMERA_MOVE_MULT,

@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
 
 pub struct Resources {
-    gold: i32,
+    pub gold: i32,
     tex: Vec<Texture2D>,
 }
 impl Resources {

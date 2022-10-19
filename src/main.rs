@@ -33,7 +33,8 @@ async fn main() {
 struct Universe {
     cam: Camera,
     resources: Resources,
-    buildings: Vec<Building>,
+    buildings: Vec<Vec<Building>>,
+    building_textures: Vec<Texture2D>,
     map_tex: Texture2D,
 }
 impl Universe {
@@ -42,18 +43,31 @@ impl Universe {
     pub async fn new(map_tex: Texture2D) -> Self {
         let cam = Camera::new();
 
-        let buildings = vec![Building::new(BuildingKind::Mine)];
+        let mut row = Vec::new();
+        for _ in 0..10 {
+            row.push(Building::new(BuildingKind::None))
+        }
+        let mut buildings = Vec::new();
+        for _ in 0..10 {
+            buildings.push(row.clone());
+        }
+        buildings[0][0] = Building::new(BuildingKind::Mine);
+
+        let pickaxe = load_texture("pickaxe.png").await
+        .expect("failed to load pickaxe.png");
+        let building_textures = vec![pickaxe];
+        
         let resources = Resources::new(0).await;
         Self {
             cam,
             resources,
             buildings,
             map_tex,
+            building_textures,
         }
     }
 
     pub fn update(&mut self) {
-        //target * -24 // * -20
         self.cam.update();
         if is_mouse_button_pressed(MouseButton::Left) {
             let target_x = (self.cam.origin.0 * -20.).round();
@@ -63,7 +77,11 @@ impl Universe {
             let orig_pos_y = ((mouse_position_local().y + 0.5) * 10.).floor();
 
             let grid_pos = Vec2::new(target_x + orig_pos_x, target_y + orig_pos_y);
-            println!("grid pos = {:?}\n", grid_pos);
+            let grid_pos = check_if_safe(grid_pos);
+            
+            if let Some(pos) = grid_pos {
+                self.buildings[pos.y as usize][pos.x as usize].update(&mut self.resources);
+            }
         }
     }
 
@@ -83,35 +101,50 @@ impl Universe {
             params.clone(),
         );
 
+        let mut y = 9.;
+        for column in &self.buildings {
+            let mut x = 0.;
+            for building in column {
+                building.draw((x, y), self.building_textures.clone());
+                x += 1.;
+            }
+            y -= 1.;
+        }
+
         self.resources.draw();
     }
 }
 
 fn check_if_safe(var: Vec2) -> Option<Vec2> {
     let x = if var.x < 0. && var.x > -1. {
-        Some(0)
+        Some(0.)
     } else if var.x > 9. && var.x < 10. {
-        Some(9)
-    } else if var.x > 10. && var.x > -1.{
-        Some(var.x as i32)
+        Some(9.)
+    } else if var.x < 10. && var.x > -1.{
+        Some(var.x)
     } else {
         None
     };
 
     let y = if var.y < 0. && var.y > -1. {
-        Some(0)
+        Some(0.)
     } else if var.y > 9. && var.y < 10. {
-        Some(9)
-    } else if var.y > 10. && var.y > -1.{
-        Some(var.y as i32)
+        Some(9.)
+    } else if var.y < 10. && var.y > -1.{
+        Some(var.y)
     } else {
         None
     };
-    let mut vec: Vec2;
+    let mut vec: Vec2 = Vec2::new(0., 0.);
 
-    match x {
-        Some(i) => vec.x = i,
-        _ => None,
-    }
-    vec
+    vec.x = match x {
+        Some(x) => x,
+        None => return None,
+    };
+    vec.y = match y {
+        Some(y) => y,
+        None => return None,
+    };
+    
+    Some(vec)
 }

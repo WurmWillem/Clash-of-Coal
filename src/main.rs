@@ -1,4 +1,8 @@
 use macroquad::prelude::*;
+use std::fs;
+
+use std::mem::*;
+use std::any::type_name;
 
 mod camera;
 use camera::Camera;
@@ -57,7 +61,9 @@ impl Universe {
         .expect("failed to load pickaxe.png");
         let building_textures = vec![pickaxe];
         
-        let resources = Resources::new(0).await;
+        let resources = Resources::new(fs::read_to_string("resources.txt")
+        .expect("Should have been able to read the file").parse::<i32>().unwrap()).await;
+
         Self {
             cam,
             resources,

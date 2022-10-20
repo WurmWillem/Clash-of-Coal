@@ -56,7 +56,6 @@ impl Shop {
     }
 
     pub fn draw(&self, building_textures: &Vec<Texture2D>) {
-        
         let shop_params = DrawTextureParams {
             dest_size: Some(macroquad::prelude::Vec2::new(600., 120.)),
             ..Default::default()

@@ -1,7 +1,6 @@
-use macroquad::{texture::{Texture2D, DrawTextureParams, draw_texture_ex}, prelude::WHITE};
+use macroquad::prelude::*;
 
 use crate::resources::Resources;
-
 
 #[derive(Debug, Clone)]
 pub struct Building {
@@ -19,13 +18,13 @@ impl Building {
         }
     }
 
-    pub fn draw(&self, pos: (f32, f32), textures: Vec<Texture2D>) {
+    pub fn draw(&self, pos: (f32, f32), textures: &Vec<Texture2D>) {
         let params = DrawTextureParams {
             flip_y: true,
             dest_size: Some(macroquad::prelude::Vec2::new(0.09, 0.09)),
             ..Default::default()
         };
-        
+
         match self.kind {
             BuildingKind::Mine => {
                 draw_texture_ex(
@@ -35,14 +34,29 @@ impl Building {
                     WHITE,
                     params.clone(),
                 );
-            },
+            }
             BuildingKind::None => (),
         }
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum BuildingKind {
     None,
     Mine,
+}
+impl BuildingKind {
+    pub fn get_price(&self) -> i32 {
+        match self {
+            Self::Mine => 10,
+            _ => 0,
+        }
+    }
+
+    pub fn get_texture_index(&self) -> usize {
+        match self {
+            Self::Mine => 0,
+            Self::None => 99,
+        }
+    }
 }

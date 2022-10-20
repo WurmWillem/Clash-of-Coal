@@ -4,14 +4,23 @@ use crate::resources::Resources;
 
 #[derive(Debug, Clone)]
 pub struct Building {
-    kind: BuildingKind,
+    pub kind: BuildingKind,
+    pub price: i32,
+    pub texture_index: usize,
 }
 impl Building {
     pub fn new(kind: BuildingKind) -> Self {
-        Self { kind }
+        let price = kind.get_price();
+        let texture_index = kind.get_texture_index();
+        Self {
+            kind,
+            price,
+            texture_index,
+        }
     }
 
     pub fn update(&self, resources: &mut Resources) {
+        //Updates the resources based on the kind of building
         match &self.kind {
             BuildingKind::Mine => resources.gold += 1,
             BuildingKind::None => (),
@@ -32,7 +41,7 @@ impl Building {
                     pos.0 * 0.1 - 0.495,
                     pos.1 * 0.1 - 0.495,
                     WHITE,
-                    params.clone(),
+                    params,
                 );
             }
             BuildingKind::None => (),

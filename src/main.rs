@@ -23,6 +23,7 @@ async fn main() {
     loop {
         clear_background(LIGHTGRAY);
 
+        universe.get_input();
         universe.draw();
         universe.update();
 
@@ -55,7 +56,7 @@ impl Universe {
         for _ in 0..10 {
             buildings.push(row.clone());
         }
-        buildings[0][0] = Building::new(BuildingKind::Mine);
+        //buildings[0][0] = Building::new(BuildingKind::Mine);
 
         let pickaxe = load_texture("assets/pickaxe.png")
             .await
@@ -87,9 +88,9 @@ impl Universe {
         }
     }
 
-    pub fn update(&mut self) {
-        self.cam.update();
-
+    pub fn get_input(&mut self) {
+        //This checks if and what place on the grid is clicked and updates that place accordingly
+        //For example by adding the players held building to that place
         if is_mouse_button_pressed(MouseButton::Left) {
             let target_x = (self.cam.origin.0 * -20.).round();
             let target_y = (self.cam.origin.1 * -20.).round();
@@ -101,7 +102,12 @@ impl Universe {
             let grid_pos = check_if_safe(grid_pos);
 
             if let Some(pos) = grid_pos {
-                self.buildings[pos.y as usize][pos.x as usize].update(&mut self.resources);
+                if self.player.held_building != BuildingKind::None
+                    && self.buildings[pos.y as usize][pos.x as usize].kind == BuildingKind::None
+                {
+                    self.buildings[pos.y as usize][pos.x as usize] = Building::new(self.player.held_building);
+                    self.player.held_building = BuildingKind::None;
+                }
             }
         }
 
@@ -115,9 +121,27 @@ impl Universe {
         self.shop.get_input(&mut self.resources, &mut self.player);
     }
 
-    pub fn draw(&self) {
-        self.cam.set_as_cam();
+    pub fn update(&mut self) {
+        self.cam.update(); //Updates the camera position, which affects the place of the map on the screen but not ui 
 
+        //This checks if a second has passed, because only then do we want to update
+        let second_passed = (get_time() * 100.).floor() / 100. % 1. == 0.;
+        if !second_passed {
+            return;
+        }
+
+        //We update the resources for every building, for example by adding gold to the resources
+        for column in &self.buildings {
+            for building in column {
+                building.update(&mut self.resources);
+            }
+        }
+    }
+
+    pub fn draw(&self) {
+        self.cam.set_as_cam(); //Make sure we're drawing in camera space because the map isn't UI
+
+        //These params are used for specifying extra details on how to draw the textures, like size
         let map_params = DrawTextureParams {
             dest_size: Some(Vec2::new(1., 1.)),
             ..Default::default()
@@ -130,6 +154,7 @@ impl Universe {
             map_params,
         );
 
+        //Draw every building in the grid
         let mut y = 9.;
         for column in &self.buildings {
             let mut x = 0.;
@@ -140,8 +165,8 @@ impl Universe {
             y -= 1.;
         }
 
-        set_default_camera();
-        
+        set_default_camera();   //We want to draw UI, so we need to work with screen coordinates
+
         self.resources.draw();
         self.shop.draw(&self.building_textures);
         self.player.draw_held_item(&self.building_textures);

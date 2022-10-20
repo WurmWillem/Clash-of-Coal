@@ -1,9 +1,6 @@
 use macroquad::prelude::*;
 use std::fs;
 
-use std::mem::*;
-use std::any::type_name;
-
 mod camera;
 use camera::Camera;
 mod resources;
@@ -18,9 +15,9 @@ async fn main() {
     request_new_screen_size(SCREENSIZE.0, SCREENSIZE.1); //Set new screensize
 
     //Initialize map and camera
-    let map_tex = load_texture("map.png")
+    let map_tex = load_texture("assets/map.png")
         .await
-        .expect("failed to load map.png");
+        .expect("failed to load assets/map.png");
 
     let mut universe = Universe::new(map_tex).await;
 
@@ -57,7 +54,7 @@ impl Universe {
         }
         buildings[0][0] = Building::new(BuildingKind::Mine);
 
-        let pickaxe = load_texture("pickaxe.png").await
+        let pickaxe = load_texture("assets/pickaxe.png").await
         .expect("failed to load pickaxe.png");
         let building_textures = vec![pickaxe];
         
@@ -89,6 +86,11 @@ impl Universe {
                 self.buildings[pos.y as usize][pos.x as usize].update(&mut self.resources);
             }
         }
+
+        if is_key_pressed(KeyCode::LeftControl) && is_key_down(KeyCode::S) ||  is_key_down(KeyCode::LeftControl) && is_key_pressed(KeyCode::S){
+            println!("save");
+            self.save();
+        }
     }
 
     pub fn draw(&self) {
@@ -118,6 +120,10 @@ impl Universe {
         }
 
         self.resources.draw();
+    }
+
+    pub fn save(&self) {
+        return;
     }
 }
 

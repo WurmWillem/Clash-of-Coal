@@ -6,12 +6,12 @@ pub struct Resources {
 }
 impl Resources {
     pub async fn new(gold: i32) -> Self {
-        let gold_tex = load_texture("coin.png")
+        let gold_tex = load_texture("assets/coin.png")
             .await
-            .expect("failed to load coin png");
-        let gold_bar = load_texture("gold bar.png")
+            .expect("failed to load assets/coin.png");
+        let gold_bar = load_texture("assets/gold bar.png")
             .await
-            .expect("failed to load gold bar png");
+            .expect("failed to load assets/gold bar.png");
 
         let tex = vec![gold_tex, gold_bar];
         Self { gold, tex }

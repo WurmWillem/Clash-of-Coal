@@ -16,20 +16,6 @@ impl Camera {
         }
     }
     pub fn update(&mut self) {
-        //update camera_origin based on key presses
-        if is_key_down(KeyCode::A) {
-            self.origin.0 -= 0.01;
-        };
-        if is_key_down(KeyCode::D) {
-            self.origin.0 += 0.01;
-        };
-        if is_key_down(KeyCode::S) {
-            self.origin.1 += 0.01;
-        };
-        if is_key_down(KeyCode::W) {
-            self.origin.1 -= 0.01;
-        };
-
         // Update camera position
         if is_mouse_button_pressed(MouseButton::Left) {
             self.offset = (

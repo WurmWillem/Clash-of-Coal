@@ -115,11 +115,14 @@ impl Universe {
         }
 
         //We update the resources for every building, for example by adding gold to the resources
+        let mut gold_per_sec = 0;
         for column in &self.buildings {
             for building in column {
-                building.update(&mut self.resources);
+                self.resources.gold += building.gold_per_sec;
+                gold_per_sec += building.gold_per_sec;
             }
         }
+        self.resources.gold_per_sec = gold_per_sec;
     }
 
     pub fn draw(&self) {

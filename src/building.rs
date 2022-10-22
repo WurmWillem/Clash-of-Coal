@@ -2,32 +2,23 @@ use macroquad::prelude::*;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::resources::Resources;
-
 #[derive(Debug, Clone)]
 pub struct Building {
     pub kind: BuildingKind,
     pub price: i32,
+    pub gold_per_sec: i32,
     pub texture_index: usize,
 }
 impl Building {
     pub fn new(kind: BuildingKind) -> Self {
         let price = kind.get_price();
+        let gold_per_sec = kind.get_gold_per_sec();
         let texture_index = kind.get_texture_index();
         Self {
             kind,
             price,
+            gold_per_sec,
             texture_index,
-        }
-    }
-
-    pub fn update(&self, resources: &mut Resources) {
-        //Updates the resources based on the kind of building
-        match &self.kind {
-            BuildingKind::Mine => resources.gold += 1,
-            BuildingKind::Mine2 => resources.gold += 4,
-            BuildingKind::Mine3 => resources.gold += 10,
-            BuildingKind::None => (),
         }
     }
 
@@ -65,6 +56,15 @@ impl BuildingKind {
             Self::Mine => 10,
             Self::Mine2 => 50,
             Self::Mine3 => 150,
+            _ => 0,
+        }
+    }
+
+    pub fn get_gold_per_sec(&self) -> i32 {
+        match self {
+            Self::Mine => 1,
+            Self::Mine2 => 4,
+            Self::Mine3 => 10,
             _ => 0,
         }
     }

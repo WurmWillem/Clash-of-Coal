@@ -1,0 +1,46 @@
+
+{
+     "resource": [
+          {
+               "kind": "gold",
+               "amount": 100
+          },
+          {
+               "kind": "gems",
+               "amount": 10
+          }
+     ],
+     "camera": {
+          "origin": (0.0, 0.0),
+          "offset": (0.0, 0.0),
+     }
+    
+}
+
+
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Player {
+     pub held_building: String,
+ }
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Building {
+    pub kind: String,
+    pub price: i32,
+    pub texture_index: usize,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Resources {
+    resources: Vec<Resource>,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Universe {
+    cam: Camera,
+    player: Player,
+    resources: Resources,
+    buildings: Vec<Building>,
+}
+}

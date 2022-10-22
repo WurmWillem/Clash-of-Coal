@@ -1,5 +1,5 @@
 use macroquad::prelude::*;
-use json::JsonValue;
+use strum::IntoEnumIterator;
 
 use crate::{
     building::{Building, BuildingKind},
@@ -17,7 +17,7 @@ pub struct Universe {
     buildings: Vec<Vec<Building>>,
     building_textures: Vec<Texture2D>,
     map_tex: Texture2D,
-    data: JsonValue,
+ 
 }
 impl Universe {
     const MAP_COORDS: Vec2 = Vec2::new(-0.5, -0.5);
@@ -40,11 +40,9 @@ impl Universe {
 
         let data = std::fs::read_to_string("data.json").expect("failed to read resources.json");
         let data = json::parse(&format!(r#"{}"#, data)).expect("failed to parse resources.json");
-        
-        let resources = Resources::new(
-            data["gold"].as_i32().expect("failed to parse gold to i32")
-        )
-        .await;
+
+        let resources =
+            Resources::new(data["gold"].as_i32().expect("failed to parse gold to i32")).await;
 
         let mut buildings = Vec::new();
         let mut index = 0;
@@ -56,7 +54,7 @@ impl Universe {
                     Some("Mine2") => BuildingKind::Mine2,
                     Some("Mine3") => BuildingKind::Mine3,
                     Some("None") => BuildingKind::None,
-                    _ => BuildingKind::None
+                    _ => BuildingKind::None,
                 }));
                 index += 1;
             }
@@ -77,7 +75,7 @@ impl Universe {
             buildings,
             map_tex,
             building_textures,
-            data
+            
         }
     }
 
@@ -108,8 +106,12 @@ impl Universe {
         if is_key_pressed(KeyCode::LeftControl) && is_key_down(KeyCode::S)
             || is_key_down(KeyCode::LeftControl) && is_key_pressed(KeyCode::S)
         {
-            println!("save");
             self.save();
+        }
+        if is_key_pressed(KeyCode::LeftControl) && is_key_down(KeyCode::R)
+            || is_key_down(KeyCode::LeftControl) && is_key_pressed(KeyCode::R)
+        {
+            self.reset();
         }
 
         self.shop.get_input(&mut self.resources, &mut self.player);
@@ -170,26 +172,43 @@ impl Universe {
     }
 
     fn save(&mut self) {
-        let data = std::fs::read_to_string("data.json").expect("failed to read data.json");
-        let mut data = json::parse(&format!(r#"{}"#, data)).expect("failed to parse data.json");
-        
+        let data = std::fs::read_to_string("data.json").expect("failed to read resources.json");
+        let mut data = json::parse(&format!(r#"{}"#, data)).expect("failed to parse resources.json");
+
         data["gold"] = self.resources.gold.into();
 
-        std::fs::write("data.json", format!(r#"{}"#, data.to_string())).expect("failed to write to data.json");
-        self.data["gold"] = self.resources.gold.into();
         let mut buildings_vec = Vec::new();
         for column in &self.buildings {
             for building in column {
-                buildings_vec.push(match building.kind {
-                    BuildingKind::Mine => "Mine",
-                    BuildingKind::Mine2 => "Mine2",
-                    BuildingKind::Mine3 => "Mine3",
-                    BuildingKind::None => "None",
-                });
+                buildings_vec.push(building.kind.get_str());
             }
         }
-        self.data["buildings"] = buildings_vec.into();
-        std::fs::write("data.json", format!(r#"{}"#, self.data.to_string())).unwrap();
+        data["buildings"] = buildings_vec.into();
+
+        std::fs::write("data.json", format!(r#"{}"#, data.to_string())).unwrap();
+    }
+
+    fn reset(&mut self) {
+        let mut buildings = Vec::new();
+        for _ in 0..10 {
+            let mut row = Vec::new();
+            for _ in 0..10 {
+                row.push(Building::new(BuildingKind::None))
+            }
+            buildings.push(row);
+        }
+        self.buildings = buildings;
+
+        self.resources.gold = 25;
+
+        let mut buildings = Vec::new();
+        for kind in BuildingKind::iter() {
+            if kind != BuildingKind::None {
+                buildings.push(Building::new(kind));
+            }
+        }
+        self.shop.buildings = buildings;
+        
     }
 }
 

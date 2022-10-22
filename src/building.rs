@@ -82,4 +82,13 @@ impl BuildingKind {
         }
         99
     }
+
+    pub fn get_str(&self) -> &str {
+        match self {
+            Self::Mine => "Mine",
+            Self::Mine2 => "Mine2",
+            Self::Mine3 => "Mine3",
+            _ => "None",
+        }
+    }
 }

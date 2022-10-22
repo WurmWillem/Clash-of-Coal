@@ -14,7 +14,7 @@ const Y: f32 = 590.;
 const BUILDING_SIZE: f32 = 50.;
 
 pub struct Shop {
-    buildings: Vec<Building>,
+    pub buildings: Vec<Building>,
     textures: Vec<Texture2D>,
 }
 impl Shop {

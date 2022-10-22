@@ -1,3 +1,4 @@
+use json::JsonValue;
 use macroquad::prelude::*;
 
 use crate::{
@@ -17,6 +18,7 @@ pub struct Universe {
     buildings: Vec<Vec<Building>>,
     building_textures: Vec<Texture2D>,
     map_tex: Texture2D,
+    data: JsonValue,
 }
 impl Universe {
     const MAP_COORDS: Vec2 = Vec2::new(-0.5, -0.5);
@@ -46,11 +48,11 @@ impl Universe {
             .expect("failed to load pickaxe3.png");
         let building_textures = vec![mine, mine2, mine3];
 
+        let data = fs::read_to_string("resources.json").expect("failed to read resources.json");
+        let data = json::parse(&format!(r#"{}"#, data)).expect("failed to parse resources.json");
+        
         let resources = Resources::new(
-            fs::read_to_string("resources.txt")
-                .expect("Should have been able to read the file")
-                .parse::<i32>()
-                .unwrap(),
+            data["gold"].as_i32().unwrap()
         )
         .await;
 
@@ -68,6 +70,7 @@ impl Universe {
             buildings,
             map_tex,
             building_textures,
+            data,
         }
     }
 
@@ -159,8 +162,9 @@ impl Universe {
         self.player.draw_held_item(&self.building_textures);
     }
 
-    fn save(&self) {
-        return;
+    fn save(&mut self) {
+        self.data["gold"] = self.resources.gold.into();
+        fs::write("resources.json", format!(r#"{}"#, self.data.to_string())).unwrap();
     }
 }
 

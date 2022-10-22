@@ -26,15 +26,6 @@ impl Universe {
 
         let player = Player::new();
 
-        let mut row = Vec::new();
-        for _ in 0..10 {
-            row.push(Building::new(BuildingKind::None))
-        }
-        let mut buildings = Vec::new();
-        for _ in 0..10 {
-            buildings.push(row.clone());
-        }
-
         let mine = load_texture("assets/pickaxe.png")
             .await
             .expect("failed to load pickaxe.png");
@@ -48,11 +39,33 @@ impl Universe {
 
         let data = fs::read_to_string("resources.json").expect("failed to read resources.json");
         let data = json::parse(&format!(r#"{}"#, data)).expect("failed to parse resources.json");
+<<<<<<< Updated upstream
         
         let resources = Resources::new(
             data["gold"].as_i32().expect("failed to parse gold to i32")
         )
         .await;
+=======
+
+        let mut buildings = Vec::new();
+        let mut index = 0;
+        for _ in 0..10 {
+            let mut row = Vec::new();
+            for _ in 0..10 {
+                row.push(Building::new(match data["buildings"][index].as_str() {
+                    Some("Mine") => BuildingKind::Mine,
+                    Some("Mine2") => BuildingKind::Mine2,
+                    Some("Mine3") => BuildingKind::Mine3,
+                    Some("None") => BuildingKind::None,
+                    _ => BuildingKind::None
+                }));
+                index += 1;
+            }
+            buildings.push(row);
+        }
+
+        let resources = Resources::new(data["gold"].as_i32().unwrap()).await;
+>>>>>>> Stashed changes
 
         let map_tex = load_texture("assets/map.png")
             .await
@@ -160,12 +173,30 @@ impl Universe {
     }
 
     fn save(&mut self) {
+<<<<<<< Updated upstream
         let data = fs::read_to_string("resources.json").expect("failed to read resources.json");
         let mut data = json::parse(&format!(r#"{}"#, data)).expect("failed to parse resources.json");
         
         data["gold"] = self.resources.gold.into();
 
         fs::write("resources.json", format!(r#"{}"#, data.to_string())).expect("failed to write to resources.json");
+=======
+        self.data["gold"] = self.resources.gold.into();
+        // buildings: Vec<Vec<Building>>,
+        let mut buildings_vec = Vec::new();
+        for column in &self.buildings {
+            for building in column {
+                buildings_vec.push(match building.kind {
+                    BuildingKind::Mine => "Mine",
+                    BuildingKind::Mine2 => "Mine2",
+                    BuildingKind::Mine3 => "Mine3",
+                    BuildingKind::None => "None",
+                });
+            }
+        }
+        self.data["buildings"] = buildings_vec.into();
+        fs::write("resources.json", format!(r#"{}"#, self.data.to_string())).unwrap();
+>>>>>>> Stashed changes
     }
 }
 

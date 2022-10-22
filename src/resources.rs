@@ -18,7 +18,11 @@ impl Resources {
 
         let gold_per_sec = 0;
 
-        Self { gold, tex, gold_per_sec }
+        Self {
+            gold,
+            tex,
+            gold_per_sec,
+        }
     }
 
     pub fn draw(&self) {
@@ -36,6 +40,12 @@ impl Resources {
         draw_texture_ex(self.tex[1], 160., 10., WHITE, bar_param.clone());
         draw_text(&self.gold.to_string(), 170., 51., 40., BLACK);
 
-        draw_text(&format!("gold/s = {}", self.gold_per_sec.to_string()), 170., 91., 20., BLACK);
+        draw_text(
+            &format!("gold/s = {}", self.gold_per_sec.to_string()),
+            170.,
+            91.,
+            20.,
+            BLACK,
+        );
     }
 }

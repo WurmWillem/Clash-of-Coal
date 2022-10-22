@@ -50,7 +50,7 @@ impl Universe {
         let data = json::parse(&format!(r#"{}"#, data)).expect("failed to parse resources.json");
         
         let resources = Resources::new(
-            data["gold"].as_i32().unwrap()
+            data["gold"].as_i32().expect("failed to parse gold to i32")
         )
         .await;
 
@@ -165,7 +165,7 @@ impl Universe {
         
         data["gold"] = self.resources.gold.into();
 
-        fs::write("resources.json", format!(r#"{}"#, data.to_string())).unwrap();
+        fs::write("resources.json", format!(r#"{}"#, data.to_string())).expect("failed to write to resources.json");
     }
 }
 

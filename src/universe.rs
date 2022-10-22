@@ -170,14 +170,13 @@ impl Universe {
     }
 
     fn save(&mut self) {
-        let data = std::fs::read_to_string("resources.json").expect("failed to read resources.json");
-        let mut data = json::parse(&format!(r#"{}"#, data)).expect("failed to parse resources.json");
+        let data = std::fs::read_to_string("data.json").expect("failed to read data.json");
+        let mut data = json::parse(&format!(r#"{}"#, data)).expect("failed to parse data.json");
         
         data["gold"] = self.resources.gold.into();
 
-        std::fs::write("resources.json", format!(r#"{}"#, data.to_string())).expect("failed to write to resources.json");
+        std::fs::write("data.json", format!(r#"{}"#, data.to_string())).expect("failed to write to data.json");
         self.data["gold"] = self.resources.gold.into();
-        // buildings: Vec<Vec<Building>>,
         let mut buildings_vec = Vec::new();
         for column in &self.buildings {
             for building in column {
@@ -190,7 +189,7 @@ impl Universe {
             }
         }
         self.data["buildings"] = buildings_vec.into();
-        std::fs::write("resources.json", format!(r#"{}"#, self.data.to_string())).unwrap();
+        std::fs::write("data.json", format!(r#"{}"#, self.data.to_string())).unwrap();
     }
 }
 

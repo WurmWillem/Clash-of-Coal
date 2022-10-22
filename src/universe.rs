@@ -1,4 +1,5 @@
 use macroquad::prelude::*;
+use json::JsonValue;
 
 use crate::{
     building::{Building, BuildingKind},
@@ -7,7 +8,6 @@ use crate::{
     resources::Resources,
     shop::Shop,
 };
-use std::fs;
 
 pub struct Universe {
     cam: Camera,
@@ -17,6 +17,7 @@ pub struct Universe {
     buildings: Vec<Vec<Building>>,
     building_textures: Vec<Texture2D>,
     map_tex: Texture2D,
+    data: JsonValue,
 }
 impl Universe {
     const MAP_COORDS: Vec2 = Vec2::new(-0.5, -0.5);
@@ -37,15 +38,13 @@ impl Universe {
             .expect("failed to load pickaxe3.png");
         let building_textures = vec![mine, mine2, mine3];
 
-        let data = fs::read_to_string("resources.json").expect("failed to read resources.json");
+        let data = std::fs::read_to_string("resources.json").expect("failed to read resources.json");
         let data = json::parse(&format!(r#"{}"#, data)).expect("failed to parse resources.json");
-<<<<<<< Updated upstream
         
         let resources = Resources::new(
             data["gold"].as_i32().expect("failed to parse gold to i32")
         )
         .await;
-=======
 
         let mut buildings = Vec::new();
         let mut index = 0;
@@ -64,9 +63,6 @@ impl Universe {
             buildings.push(row);
         }
 
-        let resources = Resources::new(data["gold"].as_i32().unwrap()).await;
->>>>>>> Stashed changes
-
         let map_tex = load_texture("assets/map.png")
             .await
             .expect("failed to load assets/map.png");
@@ -81,6 +77,7 @@ impl Universe {
             buildings,
             map_tex,
             building_textures,
+            data
         }
     }
 
@@ -173,14 +170,12 @@ impl Universe {
     }
 
     fn save(&mut self) {
-<<<<<<< Updated upstream
-        let data = fs::read_to_string("resources.json").expect("failed to read resources.json");
+        let data = std::fs::read_to_string("resources.json").expect("failed to read resources.json");
         let mut data = json::parse(&format!(r#"{}"#, data)).expect("failed to parse resources.json");
         
         data["gold"] = self.resources.gold.into();
 
-        fs::write("resources.json", format!(r#"{}"#, data.to_string())).expect("failed to write to resources.json");
-=======
+        std::fs::write("resources.json", format!(r#"{}"#, data.to_string())).expect("failed to write to resources.json");
         self.data["gold"] = self.resources.gold.into();
         // buildings: Vec<Vec<Building>>,
         let mut buildings_vec = Vec::new();
@@ -195,8 +190,7 @@ impl Universe {
             }
         }
         self.data["buildings"] = buildings_vec.into();
-        fs::write("resources.json", format!(r#"{}"#, self.data.to_string())).unwrap();
->>>>>>> Stashed changes
+        std::fs::write("resources.json", format!(r#"{}"#, self.data.to_string())).unwrap();
     }
 }
 

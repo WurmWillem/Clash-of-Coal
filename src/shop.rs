@@ -1,4 +1,5 @@
 use macroquad::prelude::*;
+use strum::IntoEnumIterator;
 
 use crate::{
     building::{Building, BuildingKind},
@@ -18,7 +19,12 @@ pub struct Shop {
 }
 impl Shop {
     pub async fn new() -> Self {
-        let buildings = vec![Building::new(BuildingKind::Mine)];
+        let mut buildings = Vec::new();
+        for kind in BuildingKind::iter() {
+            if kind != BuildingKind::None {
+                buildings.push(Building::new(kind));
+            }
+        }
 
         let bar_tex = load_texture("assets/shop_bar.png")
             .await
@@ -32,11 +38,12 @@ impl Shop {
         }
     }
 
-    pub fn get_input(&self, resources: &mut Resources, player: &mut Player) {
+    pub fn get_input(&mut self, resources: &mut Resources, player: &mut Player) {
         set_default_camera(); //Needed because we want the ui to be static, so we want to draw in screen space instead of our camera space
 
         //Checks if a building in the shop is pressed and acts accordingly
         //For example by making the players held building the building in the shop and subtracting the price to the players gold
+        let mut new_price = None;
         let mut x = 0.;
         for building in &self.buildings {
             let pos_x = x * X_INCREASE + X_OFFSET;
@@ -48,10 +55,17 @@ impl Shop {
                 && mouse_position().0 <= Y + BUILDING_SIZE
                 && is_mouse_button_pressed(MouseButton::Left)
             {
-                player.held_building = building.kind;
-                resources.gold -= building.price;
+                if resources.gold >= building.price {
+                    player.held_building = building.kind;
+                    resources.gold -= building.price;
+                    new_price = Some(building.price / 5);
+                    break;
+                }
             }
             x += 1.;
+        }
+        if let Some(price) = new_price {
+            self.buildings[x as usize].price += price;
         }
     }
 
@@ -70,19 +84,18 @@ impl Shop {
         //The actual drawing occurs here
         let mut x = 0.;
         for building in &self.buildings {
-            match building.kind {
-                BuildingKind::Mine => {
-                    draw_texture_ex(
-                        building_textures[0],
-                        x * X_INCREASE + X_OFFSET,
-                        Y,
-                        WHITE,
-                        building_params.clone(),
-                    );
-                    draw_text(&building.price.to_string(), x * 70. + 80., 675., 30., BLACK)
-                }
-                BuildingKind::None => (),
+            if building.kind == BuildingKind::None {
+                return;
             }
+            draw_texture_ex(
+                building_textures[building.texture_index],
+                x * X_INCREASE + X_OFFSET,
+                Y,
+                WHITE,
+                building_params.clone(),
+            );
+            draw_text(&building.price.to_string(), x * 70. + 80., 675., 30., BLACK);
+
             x += 1.;
         }
     }

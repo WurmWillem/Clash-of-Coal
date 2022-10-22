@@ -34,12 +34,17 @@ impl Universe {
         for _ in 0..10 {
             buildings.push(row.clone());
         }
-        //buildings[0][0] = Building::new(BuildingKind::Mine);
 
-        let pickaxe = load_texture("assets/pickaxe.png")
+        let mine = load_texture("assets/pickaxe.png")
             .await
             .expect("failed to load pickaxe.png");
-        let building_textures = vec![pickaxe];
+        let mine2 = load_texture("assets/pickaxe2.png")
+            .await
+            .expect("failed to load pickaxe2.png");
+        let mine3 = load_texture("assets/pickaxe3.png")
+            .await
+            .expect("failed to load pickaxe3.png");
+        let building_textures = vec![mine, mine2, mine3];
 
         let resources = Resources::new(
             fs::read_to_string("resources.txt")

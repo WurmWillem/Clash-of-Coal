@@ -38,7 +38,7 @@ impl Universe {
             .expect("failed to load pickaxe3.png");
         let building_textures = vec![mine, mine2, mine3];
 
-        let data = std::fs::read_to_string("resources.json").expect("failed to read resources.json");
+        let data = std::fs::read_to_string("data.json").expect("failed to read resources.json");
         let data = json::parse(&format!(r#"{}"#, data)).expect("failed to parse resources.json");
         
         let resources = Resources::new(
